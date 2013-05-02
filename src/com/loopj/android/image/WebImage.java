@@ -4,9 +4,15 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+
+
 
 public class WebImage implements SmartImage {
     private static final int CONNECT_TIMEOUT = 5000;
@@ -14,10 +20,17 @@ public class WebImage implements SmartImage {
 
     private static WebImageCache webImageCache;
 
-    private String url;
+    private final String url;
+    
+	private SSLSocketFactory sslSocketFactory;
 
     public WebImage(String url) {
+        this(url, null);
+    }
+
+    public WebImage(String url, SSLSocketFactory sslSocketFactory) {
         this.url = url;
+        this.sslSocketFactory = sslSocketFactory;
     }
 
     public Bitmap getBitmap(Context context) {
@@ -45,7 +58,12 @@ public class WebImage implements SmartImage {
         Bitmap bitmap = null;
 
         try {
-            URLConnection conn = new URL(url).openConnection();
+        	URLConnection conn = new URL(url).openConnection();
+        	
+        	if(url.startsWith("https") && sslSocketFactory != null) {
+        		((HttpsURLConnection)conn).setSSLSocketFactory(sslSocketFactory); 
+        	}
+        	
             conn.setConnectTimeout(CONNECT_TIMEOUT);
             conn.setReadTimeout(READ_TIMEOUT);
             bitmap = BitmapFactory.decodeStream((InputStream) conn.getContent());

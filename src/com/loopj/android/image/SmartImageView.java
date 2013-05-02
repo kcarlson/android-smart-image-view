@@ -1,19 +1,22 @@
 package com.loopj.android.image;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.net.ssl.SSLSocketFactory;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.widget.ImageView;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class SmartImageView extends ImageView {
     private static final int LOADING_THREADS = 4;
     private static ExecutorService threadPool = Executors.newFixedThreadPool(LOADING_THREADS);
 
     private SmartImageTask currentTask;
-
+    
+    private SSLSocketFactory sslSocketFactory;
 
     public SmartImageView(Context context) {
         super(context);
@@ -26,31 +29,34 @@ public class SmartImageView extends ImageView {
     public SmartImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
-
+    
+    public void setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
+		this.sslSocketFactory = sslSocketFactory;
+	}
 
     // Helpers to set image by URL
     public void setImageUrl(String url) {
-        setImage(new WebImage(url));
+        setImage(new WebImage(url, sslSocketFactory));
     }
 
     public void setImageUrl(String url, SmartImageTask.OnCompleteListener completeListener) {
-        setImage(new WebImage(url), completeListener);
+        setImage(new WebImage(url, sslSocketFactory), completeListener);
     }
 
     public void setImageUrl(String url, final Integer fallbackResource) {
-        setImage(new WebImage(url), fallbackResource);
+        setImage(new WebImage(url, sslSocketFactory), fallbackResource);
     }
 
     public void setImageUrl(String url, final Integer fallbackResource, SmartImageTask.OnCompleteListener completeListener) {
-        setImage(new WebImage(url), fallbackResource, completeListener);
+        setImage(new WebImage(url, sslSocketFactory), fallbackResource, completeListener);
     }
 
     public void setImageUrl(String url, final Integer fallbackResource, final Integer loadingResource) {
-        setImage(new WebImage(url), fallbackResource, loadingResource);
+        setImage(new WebImage(url, sslSocketFactory), fallbackResource, loadingResource);
     }
 
     public void setImageUrl(String url, final Integer fallbackResource, final Integer loadingResource, SmartImageTask.OnCompleteListener completeListener) {
-        setImage(new WebImage(url), fallbackResource, loadingResource, completeListener);
+        setImage(new WebImage(url, sslSocketFactory), fallbackResource, loadingResource, completeListener);
     }
 
 
