@@ -36,27 +36,27 @@ public class SmartImageView extends ImageView {
 
     // Helpers to set image by URL
     public void setImageUrl(String url) {
-        setImage(new WebImage(url, sslSocketFactory));
+        setImage(new WebImage(url));
     }
 
     public void setImageUrl(String url, SmartImageTask.OnCompleteListener completeListener) {
-        setImage(new WebImage(url, sslSocketFactory), completeListener);
+        setImage(new WebImage(url), completeListener);
     }
 
     public void setImageUrl(String url, final Integer fallbackResource) {
-        setImage(new WebImage(url, sslSocketFactory), fallbackResource);
+        setImage(new WebImage(url), fallbackResource);
     }
 
     public void setImageUrl(String url, final Integer fallbackResource, SmartImageTask.OnCompleteListener completeListener) {
-        setImage(new WebImage(url, sslSocketFactory), fallbackResource, completeListener);
+        setImage(new WebImage(url), fallbackResource, completeListener);
     }
 
     public void setImageUrl(String url, final Integer fallbackResource, final Integer loadingResource) {
-        setImage(new WebImage(url, sslSocketFactory), fallbackResource, loadingResource);
+        setImage(new WebImage(url), fallbackResource, loadingResource);
     }
 
     public void setImageUrl(String url, final Integer fallbackResource, final Integer loadingResource, SmartImageTask.OnCompleteListener completeListener) {
-        setImage(new WebImage(url, sslSocketFactory), fallbackResource, loadingResource, completeListener);
+        setImage(new WebImage(url), fallbackResource, loadingResource, completeListener);
     }
 
 

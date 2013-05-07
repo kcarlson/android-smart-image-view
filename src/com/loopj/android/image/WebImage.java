@@ -19,18 +19,17 @@ public class WebImage implements SmartImage {
     private static final int READ_TIMEOUT = 10000;
 
     private static WebImageCache webImageCache;
-
-    private final String url;
     
-	private SSLSocketFactory sslSocketFactory;
+    private static SSLSocketFactory sslSocketFactory;
+
+    public static void setSSLSocketFactory(SSLSocketFactory sslSocketFactory) {
+    	WebImage.sslSocketFactory = sslSocketFactory;
+    }
+    
+    private final String url;
 
     public WebImage(String url) {
-        this(url, null);
-    }
-
-    public WebImage(String url, SSLSocketFactory sslSocketFactory) {
         this.url = url;
-        this.sslSocketFactory = sslSocketFactory;
     }
 
     public Bitmap getBitmap(Context context) {
