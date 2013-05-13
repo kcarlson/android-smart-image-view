@@ -22,8 +22,9 @@ public class WebImageCache {
     private String diskCachePath;
     private boolean diskCacheEnabled = false;
     private ExecutorService writeThread;
+    private final WebImageCacheKeyProvider webImageCacheKeyProvider;
 
-    public WebImageCache(Context context) {
+    public WebImageCache(Context context, WebImageCacheKeyProvider webImageCacheKeyProvider) {
         // Set up in-memory cache store
         memoryCache = new ConcurrentHashMap<String, SoftReference<Bitmap>>();
 
@@ -38,6 +39,8 @@ public class WebImageCache {
 
         // Set up threadpool for image fetching tasks
         writeThread = Executors.newSingleThreadExecutor();
+        
+        this.webImageCacheKeyProvider = webImageCacheKeyProvider;
     }
 
     public Bitmap get(final String url) {
@@ -70,10 +73,10 @@ public class WebImageCache {
         }
 
         // Remove from memory cache
-        memoryCache.remove(getCacheKey(url));
+        memoryCache.remove(webImageCacheKeyProvider.getCacheKey(url));
 
         // Remove from file cache
-        File f = new File(diskCachePath, getCacheKey(url));
+        File f = new File(diskCachePath, webImageCacheKeyProvider.getCacheKey(url));
         if(f.exists() && f.isFile()) {
             f.delete();
         }
@@ -96,7 +99,7 @@ public class WebImageCache {
     }
 
     private void cacheBitmapToMemory(final String url, final Bitmap bitmap) {
-        memoryCache.put(getCacheKey(url), new SoftReference<Bitmap>(bitmap));
+        memoryCache.put(webImageCacheKeyProvider.getCacheKey(url), new SoftReference<Bitmap>(bitmap));
     }
 
     private void cacheBitmapToDisk(final String url, final Bitmap bitmap) {
@@ -106,7 +109,7 @@ public class WebImageCache {
                 if(diskCacheEnabled) {
                     BufferedOutputStream ostream = null;
                     try {
-                        ostream = new BufferedOutputStream(new FileOutputStream(new File(diskCachePath, getCacheKey(url))), 2*1024);
+                        ostream = new BufferedOutputStream(new FileOutputStream(new File(diskCachePath, webImageCacheKeyProvider.getCacheKey(url))), 2*1024);
                         bitmap.compress(CompressFormat.PNG, 100, ostream);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -125,7 +128,7 @@ public class WebImageCache {
 
     private Bitmap getBitmapFromMemory(String url) {
         Bitmap bitmap = null;
-        SoftReference<Bitmap> softRef = memoryCache.get(getCacheKey(url));
+        SoftReference<Bitmap> softRef = memoryCache.get(webImageCacheKeyProvider.getCacheKey(url));
         if(softRef != null){
             bitmap = softRef.get();
         }
@@ -146,14 +149,6 @@ public class WebImageCache {
     }
 
     private String getFilePath(String url) {
-        return diskCachePath + getCacheKey(url);
-    }
-
-    private String getCacheKey(String url) {
-        if(url == null){
-            throw new RuntimeException("Null url passed in");
-        } else {
-            return url.replaceAll("[.:/,%?&=]", "+").replaceAll("[+]+", "+");
-        }
+        return diskCachePath + webImageCacheKeyProvider.getCacheKey(url);
     }
 }
